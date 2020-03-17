@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Test
@@ -25,6 +26,16 @@ namespace Test
                 PublishPosts.Add(user, posts);
             }
             
+        }
+
+        // given a list of user to get a subset of the published post and filtered by the list of user
+        internal IEnumerable<Post> GetFeed(IEnumerable<User> follows)
+        {
+            var feed = from kvp in PublishPosts
+                       where follows.Contains(kvp.Key)
+                       select kvp.Value;
+
+            return feed.SelectMany(lst => from post in lst select post);
         }
     }
 }
