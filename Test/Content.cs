@@ -9,6 +9,9 @@ namespace Test
         // create a collection containing user and posts and instantiate to the default
         // as one user can have many post, so we a list of posts
         internal Dictionary<User, List<Post>> PublishPosts { get; set; } = new Dictionary<User, List<Post>>();
+        internal Dictionary<User, List<Post>> LikedPosts { get; set; } = new Dictionary<User, List<Post>>();
+        internal Dictionary<User, List<Post>> SharedPosts { get; set; } = new Dictionary<User, List<Post>>();
+
 
         internal void Publish(User user, Post post)
         {
@@ -36,6 +39,40 @@ namespace Test
                        select kvp.Value;
 
             return feed.SelectMany(lst => from post in lst select post);
+        }
+
+        internal void Like(User user, Post post)
+        {
+            // if the user exists
+            if (LikedPosts.ContainsKey(user))
+            {
+                // add the post to the existing collection
+                LikedPosts[user].Add(post);
+
+            }
+            else
+            {
+                // create a new list of post and add the user
+                var posts = new List<Post> { post };
+                LikedPosts.Add(user, posts);
+            }
+        }
+
+        internal void Share(User user, Post post)
+        {
+            // if the user exists
+            if (SharedPosts.ContainsKey(user))
+            {
+                // add the post to the existing collection
+                SharedPosts[user].Add(post);
+
+            }
+            else
+            {
+                // create a new list of post and add the user
+                var posts = new List<Post> { post };
+                SharedPosts.Add(user, posts);
+            };
         }
     }
 }

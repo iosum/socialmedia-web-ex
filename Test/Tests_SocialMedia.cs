@@ -82,5 +82,46 @@ namespace Test
 
             Check.That(feed).CountIs(2);
         }
+        [TestMethod]
+        public void Test_004()
+        {
+            var u1 = new User(1);
+            var u2 = new User(2);
+            var u3 = new User(3);
+            var u4 = new User(4);
+            var u5 = new User(5);
+
+            // user1 follows user2
+            // user2 follows user3
+
+            var graph = new SocialGraph();
+            // first parameter is the one who is following
+            // second parameter is the one who is being followed by u1
+            graph.Follows(u1, u2);
+            graph.Follows(u1, u3);
+            graph.Follows(u1, u4);
+            graph.Follows(u1, u5);
+
+            var post1 = new Post("One");
+            var post2 = new Post("Two");
+
+            // content managing the association between user and post
+            var content = new Content();
+            content.Publish(u2, post1);
+            content.Publish(u3, post2);
+
+            // add like to posts
+            // (user1 likes post1)
+            content.Like(u1, post1);
+            content.Share(u1, post1);
+
+            Check.That(content.LikedPosts.Keys).CountIs(1);
+            Check.That(content.LikedPosts.Keys).Contains(u1);
+            Check.That(content.LikedPosts[u1]).Contains(post1);
+
+            Check.That(content.SharedPosts.Keys).CountIs(1);
+            Check.That(content.SharedPosts.Keys).Contains(u1);
+            Check.That(content.SharedPosts[u1]).Contains(post1);
+        }
     }
 }
