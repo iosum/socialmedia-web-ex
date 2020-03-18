@@ -16,7 +16,7 @@ namespace Test
         internal void Publish(User user, Post post)
         {
             // if the user exists
-            if(PublishPosts.ContainsKey(user))
+            if (PublishPosts.ContainsKey(user))
             {
                 // add the post to the existing collection
                 PublishPosts[user].Add(post);
@@ -28,17 +28,25 @@ namespace Test
                 var posts = new List<Post> { post };
                 PublishPosts.Add(user, posts);
             }
-            
+
         }
 
         // given a list of user to get a subset of the published post and filtered by the list of user
         internal IEnumerable<Post> GetFeed(IEnumerable<User> follows)
         {
-            var feed = from kvp in PublishPosts
-                       where follows.Contains(kvp.Key)
-                       select kvp.Value;
+            var feedPublished = from kvp in PublishPosts
+                                where follows.Contains(kvp.Key)
+                                select kvp.Value;
+            var feedLiked = from kvp in LikedPosts
+                            where follows.Contains(kvp.Key)
+                            select kvp.Value;
+            var feedShared = from kvp in SharedPosts
+                             where follows.Contains(kvp.Key)
+                             select kvp.Value;
 
-            return feed.SelectMany(lst => from post in lst select post);
+            return feedPublished.SelectMany(lst => from post in lst select post)
+                .Union(feedLiked.SelectMany(lst => from post in lst select post))
+                .Union(feedShared.SelectMany(lst => from post in lst select post));
         }
 
         internal void Like(User user, Post post)
